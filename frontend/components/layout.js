@@ -37,7 +37,7 @@
           </div>
         </div>
       </footer>
-      <a class="whatsapp-float" href="https://wa.me/923000000000" target="_blank" rel="noreferrer" aria-label="Chat on WhatsApp">💬</a>
+      <a class="whatsapp-float" href="https://wa.me/${window.APP_CONFIG?.WHATSAPP_NUMBER || '923000000000'}" target="_blank" rel="noreferrer" aria-label="Chat on WhatsApp">💬</a>
     `;
 
     const headerRoot = document.getElementById('layout-header');

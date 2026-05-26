@@ -2,6 +2,27 @@ const { validationResult } = require('express-validator');
 const Product = require('../models/Product');
 const ApiError = require('../utils/apiError');
 const asyncHandler = require('../utils/asyncHandler');
+const ensureObjectId = require('../utils/validateObjectId');
+
+const pickProductFields = (payload = {}) => {
+  const allowed = [
+    'name',
+    'slug',
+    'description',
+    'price',
+    'compareAtPrice',
+    'category',
+    'stock',
+    'images',
+    'isFeatured',
+    'tags'
+  ];
+
+  return allowed.reduce((acc, key) => {
+    if (payload[key] !== undefined) acc[key] = payload[key];
+    return acc;
+  }, {});
+};
 
 const validate = (req) => {
   const errors = validationResult(req);
@@ -13,7 +34,7 @@ exports.getProducts = asyncHandler(async (req, res) => {
   const query = {};
 
   if (search) query.name = { $regex: search, $options: 'i' };
-  if (category) query.category = category;
+  if (category) query.category = ensureObjectId(category, 'category id');
   if (featured === 'true') query.isFeatured = true;
   if (minPrice || maxPrice) {
     query.price = {};
@@ -26,20 +47,26 @@ exports.getProducts = asyncHandler(async (req, res) => {
 });
 
 exports.getProductById = asyncHandler(async (req, res) => {
-  const product = await Product.findById(req.params.id).populate('category', 'name slug');
+  const productId = ensureObjectId(req.params.id, 'product id');
+  const product = await Product.findById(productId).populate('category', 'name slug');
   if (!product) throw new ApiError('Product not found.', 404);
   res.json(product);
 });
 
 exports.createProduct = asyncHandler(async (req, res) => {
   validate(req);
-  const product = await Product.create(req.body);
+  const payload = pickProductFields(req.body);
+  payload.category = ensureObjectId(payload.category, 'category id');
+  const product = await Product.create(payload);
   res.status(201).json(product);
 });
 
 exports.updateProduct = asyncHandler(async (req, res) => {
   validate(req);
-  const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+  const productId = ensureObjectId(req.params.id, 'product id');
+  const payload = pickProductFields(req.body);
+  if (payload.category) payload.category = ensureObjectId(payload.category, 'category id');
+  const product = await Product.findByIdAndUpdate(productId, payload, {
     new: true,
     runValidators: true
   });
@@ -48,7 +75,8 @@ exports.updateProduct = asyncHandler(async (req, res) => {
 });
 
 exports.deleteProduct = asyncHandler(async (req, res) => {
-  const product = await Product.findByIdAndDelete(req.params.id);
+  const productId = ensureObjectId(req.params.id, 'product id');
+  const product = await Product.findByIdAndDelete(productId);
   if (!product) throw new ApiError('Product not found.', 404);
   res.json({ message: 'Product deleted successfully.' });
 });

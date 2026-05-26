@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const { validationResult } = require('express-validator');
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
@@ -22,7 +23,8 @@ const authPayload = (user) => ({
 exports.signup = asyncHandler(async (req, res) => {
   validate(req);
   const { name, email, password } = req.body;
-  const exists = await User.findOne({ email });
+  const safeEmailFilter = mongoose.sanitizeFilter({ email: String(email).trim().toLowerCase() });
+  const exists = await User.findOne(safeEmailFilter);
   if (exists) throw new ApiError('Email is already registered.', 409);
 
   const user = await User.create({ name, email, password, role: 'user' });
@@ -32,7 +34,8 @@ exports.signup = asyncHandler(async (req, res) => {
 exports.login = asyncHandler(async (req, res) => {
   validate(req);
   const { email, password } = req.body;
-  const user = await User.findOne({ email }).select('+password');
+  const safeEmailFilter = mongoose.sanitizeFilter({ email: String(email).trim().toLowerCase() });
+  const user = await User.findOne(safeEmailFilter).select('+password');
   if (!user || !(await user.matchPassword(password))) {
     throw new ApiError('Invalid email or password.', 401);
   }
@@ -43,7 +46,8 @@ exports.login = asyncHandler(async (req, res) => {
 exports.adminLogin = asyncHandler(async (req, res) => {
   validate(req);
   const { email, password } = req.body;
-  const user = await User.findOne({ email }).select('+password');
+  const safeEmailFilter = mongoose.sanitizeFilter({ email: String(email).trim().toLowerCase() });
+  const user = await User.findOne(safeEmailFilter).select('+password');
   if (!user || user.role !== 'admin' || !(await user.matchPassword(password))) {
     throw new ApiError('Invalid admin credentials.', 401);
   }

@@ -28,7 +28,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('addToCartBtn').addEventListener('click', async () => {
       try {
         await api.addToCart({ productId: id, quantity: 1 });
-        alert('Added to cart');
+        alert(`Added ${product.name} to cart`);
       } catch (error) {
         alert(`${error.message}. Please login first.`);
       }
@@ -36,8 +36,9 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     document.getElementById('wishlistBtn').addEventListener('click', async () => {
       try {
-        await api.toggleWishlist(id);
-        alert('Wishlist updated');
+        const wishlist = await api.toggleWishlist(id);
+        const isAdded = wishlist.some((item) => item._id === id);
+        alert(isAdded ? `Added ${product.name} to wishlist` : `Removed ${product.name} from wishlist`);
       } catch (error) {
         alert(`${error.message}. Please login first.`);
       }

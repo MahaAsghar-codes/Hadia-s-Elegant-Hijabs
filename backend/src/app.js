@@ -12,20 +12,30 @@ const orderRoutes = require('./routes/orderRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
+const { generalLimiter } = require('./middleware/rateLimitMiddleware');
 
 const app = express();
 
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL?.split(',') || '*'
+    origin(origin, callback) {
+      const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5500,http://127.0.0.1:5500')
+        .split(',')
+        .map((item) => item.trim())
+        .filter(Boolean);
+
+      if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+      return callback(new Error('CORS blocked for this origin.'));
+    }
   })
 );
 app.use(express.json({ limit: '1mb' }));
 app.use(morgan('dev'));
+app.use('/api', generalLimiter);
 
 app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', service: 'Hadia Elegant Hijabs API' });
+  res.json({ status: 'ok', service: "Hadia's Elegant Hijabs API" });
 });
 
 app.use('/api/auth', authRoutes);

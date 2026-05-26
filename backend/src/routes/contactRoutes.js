@@ -1,11 +1,13 @@
 const express = require('express');
 const { body } = require('express-validator');
 const { submitContact } = require('../controllers/contactController');
+const { authLimiter } = require('../middleware/rateLimitMiddleware');
 
 const router = express.Router();
 
 router.post(
   '/',
+  authLimiter,
   [
     body('name').notEmpty().withMessage('Name is required.'),
     body('email').isEmail().withMessage('Valid email is required.'),

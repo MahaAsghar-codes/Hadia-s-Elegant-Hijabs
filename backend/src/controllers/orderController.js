@@ -2,6 +2,7 @@ const Order = require('../models/Order');
 const User = require('../models/User');
 const ApiError = require('../utils/apiError');
 const asyncHandler = require('../utils/asyncHandler');
+const ensureObjectId = require('../utils/validateObjectId');
 
 exports.createOrderFromCart = asyncHandler(async (req, res) => {
   const { shippingAddress, paymentMethod = 'COD', shippingFee = 0 } = req.body;
@@ -47,7 +48,8 @@ exports.getAllOrders = asyncHandler(async (_req, res) => {
 });
 
 exports.updateOrderStatus = asyncHandler(async (req, res) => {
-  const order = await Order.findById(req.params.id);
+  const orderId = ensureObjectId(req.params.id, 'order id');
+  const order = await Order.findById(orderId);
   if (!order) throw new ApiError('Order not found.', 404);
 
   order.status = req.body.status;

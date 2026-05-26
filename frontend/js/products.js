@@ -21,7 +21,7 @@ window.addEventListener('DOMContentLoaded', async () => {
           <p>$${product.price}</p>
           <div class="card-actions">
             <a class="btn" href="/frontend/pages/product.html?id=${product._id}">Details</a>
-            <button class="btn secondary" data-add="${product._id}">Add to cart</button>
+            <button class="btn secondary" data-add="${product._id}" data-name="${product.name}">Add to cart</button>
           </div>
         </article>
       `
@@ -52,9 +52,10 @@ window.addEventListener('DOMContentLoaded', async () => {
   list.addEventListener('click', async (event) => {
     const id = event.target.dataset.add;
     if (!id) return;
+    const productName = event.target.dataset.name || 'item';
     try {
       await api.addToCart({ productId: id, quantity: 1 });
-      alert('Added to cart');
+      alert(`Added ${productName} to cart`);
     } catch (error) {
       alert(`${error.message}. Please login first.`);
     }
