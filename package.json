@@ -1,0 +1,33 @@
+{
+  "name": "hadias-elegant-hijabs",
+  "version": "1.0.0",
+  "description": "Full-stack e-commerce site for Hadia's Elegant Hijabs",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
+    "seed": "node backend/utils/seedData.js"
+  },
+  "keywords": [
+    "ecommerce",
+    "hijab",
+    "node",
+    "express",
+    "mongodb"
+  ],
+  "author": "Hadia's Elegant Hijabs",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.5.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.6.1",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
