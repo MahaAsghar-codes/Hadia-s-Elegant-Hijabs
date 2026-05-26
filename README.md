@@ -26,6 +26,7 @@ frontend/
    ```bash
    cp .env.example .env
    ```
+   - Set a strong `ADMIN_PASSWORD` before running seed.
 3. Start app:
    ```bash
    npm run dev
@@ -48,6 +49,7 @@ npm run seed
 ### Frontend (Vercel/Netlify)
 - This project serves frontend from Express static hosting.
 - If deploying frontend separately, host `frontend/` and set `window.API_BASE_URL` in `frontend/js/config.js`.
+- Set your business WhatsApp number in `frontend/js/config.js` (`window.WHATSAPP_NUMBER`).
 
 ### MongoDB Atlas
 - Create cluster, DB user, and network access rule

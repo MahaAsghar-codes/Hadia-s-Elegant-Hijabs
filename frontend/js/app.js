@@ -50,6 +50,18 @@ function renderCartCount() {
   ui.navCartCount.textContent = count;
 }
 
+function notify(message) {
+  const existing = document.querySelector('.toast-message');
+  if (existing) existing.remove();
+  const toast = document.createElement('div');
+  toast.className = 'toast-message';
+  toast.setAttribute('role', 'status');
+  toast.setAttribute('aria-live', 'polite');
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  window.setTimeout(() => toast.remove(), 2200);
+}
+
 function productCard(product) {
   const wished = localWishlist.get().includes(product._id);
   return `
@@ -75,14 +87,16 @@ function bindProductActions(scope = document) {
       const product = state.products.find((item) => item._id === button.dataset.productId);
       if (!product) return;
       localCart.add(product);
-      alert(`${product.name} added to cart`);
+      notify(`${product.name} added to cart`);
     };
   });
 
   scope.querySelectorAll('[data-action="toggle-wishlist"]').forEach((button) => {
     button.onclick = () => {
       localWishlist.toggle(button.dataset.productId);
-      window.location.reload();
+      const wished = localWishlist.get().includes(button.dataset.productId);
+      button.textContent = `${wished ? '♥' : '♡'} Wishlist`;
+      if (document.querySelector('#wishlistGrid')) loadWishlistPage();
     };
   });
 }
@@ -178,19 +192,21 @@ function loadCartPage() {
           <strong>${item.name}</strong>
           <p class="muted">${formatter.format(item.price)} × ${item.quantity}</p>
         </div>
-        <button class="btn secondary" onclick="removeFromCart('${item._id}')">Remove</button>
+        <button class="btn secondary" data-remove-id="${item._id}">Remove</button>
       </div>`
       )
       .join('');
 
+    cartList.querySelectorAll('[data-remove-id]').forEach((button) => {
+      button.onclick = () => {
+        const updatedCart = localCart.get().filter((item) => item._id !== button.dataset.removeId);
+        localCart.set(updatedCart);
+        render();
+      };
+    });
+
     const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     totalEl.textContent = formatter.format(total);
-  };
-
-  window.removeFromCart = (productId) => {
-    const cart = localCart.get().filter((item) => item._id !== productId);
-    localCart.set(cart);
-    render();
   };
 
   checkoutForm.addEventListener('submit', async (event) => {
@@ -210,9 +226,9 @@ function loadCartPage() {
       });
       localCart.set([]);
       render();
-      alert('Order placed successfully!');
+      notify('Order placed successfully!');
     } catch (error) {
-      alert(`Checkout requires login/API token: ${error.message}`);
+      notify(`Checkout requires login/API token: ${error.message}`);
     }
   });
 
@@ -248,9 +264,9 @@ function setupContactForm() {
     try {
       await hadiaApi.request('/contact', { method: 'POST', body: JSON.stringify(payload) });
       form.reset();
-      alert('Message sent successfully. We will contact you soon.');
+      notify('Message sent successfully. We will contact you soon.');
     } catch (error) {
-      alert(error.message);
+      notify(error.message);
     }
   });
 }
@@ -266,7 +282,7 @@ function setupAuthForms() {
       const data = Object.fromEntries(new FormData(signupForm));
       const response = await hadiaApi.request('/auth/register', { method: 'POST', body: JSON.stringify(data) });
       hadiaApi.setToken(response.token);
-      alert('Signup successful');
+      notify('Signup successful');
       window.location.href = '/';
     });
   }
@@ -277,7 +293,7 @@ function setupAuthForms() {
       const data = Object.fromEntries(new FormData(loginForm));
       const response = await hadiaApi.request('/auth/login', { method: 'POST', body: JSON.stringify(data) });
       hadiaApi.setToken(response.token);
-      alert('Login successful');
+      notify('Login successful');
       window.location.href = '/';
     });
   }
@@ -291,7 +307,7 @@ function setupAuthForms() {
         body: JSON.stringify(data)
       });
       hadiaApi.setToken(response.token);
-      alert('Admin login successful');
+      notify('Admin login successful');
       window.location.href = '/pages/admin';
     });
   }
@@ -453,6 +469,8 @@ function initializeApp() {
   setupContactForm();
   setupAuthForms();
   loadAdminPage();
+  const whatsappButton = document.querySelector('#whatsappBtn');
+  if (whatsappButton) whatsappButton.href = `https://wa.me/${window.WHATSAPP_NUMBER}`;
 }
 
 initializeApp();

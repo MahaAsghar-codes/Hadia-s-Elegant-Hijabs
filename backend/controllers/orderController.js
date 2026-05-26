@@ -1,6 +1,8 @@
 const User = require('../models/User');
 const Order = require('../models/Order');
 const { isValidObjectId } = require('../utils/validators');
+const { Types } = require('mongoose');
+const allowedStatuses = new Set(['pending', 'processing', 'shipped', 'delivered']);
 
 const createOrder = async (req, res, next) => {
   try {
@@ -59,14 +61,16 @@ const updateOrderStatus = async (req, res, next) => {
     if (!isValidObjectId(req.params.id)) {
       return res.status(400).json({ message: 'Invalid order id' });
     }
+    if (!allowedStatuses.has(req.body.status)) {
+      return res.status(400).json({ message: 'Invalid order status' });
+    }
 
-    const order = await Order.findByIdAndUpdate(
-      req.params.id,
-      { status: req.body.status },
-      { new: true, runValidators: true }
-    );
+    const safeOrderId = new Types.ObjectId(req.params.id);
+    const order = await Order.findOne({ _id: safeOrderId });
 
     if (!order) return res.status(404).json({ message: 'Order not found' });
+    order.status = req.body.status;
+    await order.save();
     res.json(order);
   } catch (error) {
     next(error);

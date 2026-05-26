@@ -4,6 +4,7 @@ const connectDB = require('../config/db');
 const User = require('../models/User');
 const Category = require('../models/Category');
 const Product = require('../models/Product');
+const { isStrongPassword } = require('./validators');
 
 const seed = async () => {
   await connectDB();
@@ -62,6 +63,11 @@ const seed = async () => {
 
   if (!process.env.ADMIN_PASSWORD) {
     throw new Error('ADMIN_PASSWORD must be set before running seed script');
+  }
+  if (!isStrongPassword(process.env.ADMIN_PASSWORD)) {
+    throw new Error(
+      'ADMIN_PASSWORD must be 8+ characters and include upper, lower, number, and special character'
+    );
   }
 
   await User.create({

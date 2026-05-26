@@ -24,15 +24,22 @@ app.use(express.json());
 app.use(morgan('dev'));
 
 const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 250,
+  windowMs: Number(process.env.API_RATE_LIMIT_WINDOW_MS || 15 * 60 * 1000),
+  max: Number(process.env.API_RATE_LIMIT_MAX || 250),
   standardHeaders: true,
   legacyHeaders: false
 });
 
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 30,
+  windowMs: Number(process.env.AUTH_RATE_LIMIT_WINDOW_MS || 15 * 60 * 1000),
+  max: Number(process.env.AUTH_RATE_LIMIT_MAX || 30),
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+const pagesLimiter = rateLimit({
+  windowMs: Number(process.env.PAGES_RATE_LIMIT_WINDOW_MS || 15 * 60 * 1000),
+  max: Number(process.env.PAGES_RATE_LIMIT_MAX || 300),
   standardHeaders: true,
   legacyHeaders: false
 });
@@ -53,6 +60,7 @@ app.use('/api/contact', contactRoutes);
 
 const frontendPath = path.join(__dirname, '..', 'frontend');
 app.use(express.static(frontendPath));
+app.use('/pages', pagesLimiter);
 
 const allowedPages = new Set([
   'products',
