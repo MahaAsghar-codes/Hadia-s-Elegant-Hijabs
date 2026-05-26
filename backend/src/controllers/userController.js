@@ -1,0 +1,29 @@
+const User = require('../models/User');
+const ApiError = require('../utils/apiError');
+const asyncHandler = require('../utils/asyncHandler');
+
+exports.getUsers = asyncHandler(async (_req, res) => {
+  const users = await User.find().select('-password').sort('-createdAt');
+  res.json(users);
+});
+
+exports.updateUserRole = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+  if (!user) throw new ApiError('User not found.', 404);
+  if (!['user', 'admin'].includes(req.body.role)) {
+    throw new ApiError('Role must be user or admin.', 400);
+  }
+
+  user.role = req.body.role;
+  await user.save();
+
+  res.json({ id: user._id, name: user.name, email: user.email, role: user.role });
+});
+
+exports.deleteUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+  if (!user) throw new ApiError('User not found.', 404);
+
+  await user.deleteOne();
+  res.json({ message: 'User removed successfully.' });
+});

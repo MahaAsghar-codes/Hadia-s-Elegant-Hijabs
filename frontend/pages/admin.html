@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard | Hadia's Elegant Hijabs</title>
+    <link rel="stylesheet" href="/frontend/css/style.css" />
+  </head>
+  <body>
+    <div id="layout-header"></div>
+    <main class="container page-hero" id="adminRoot">
+      <div class="card" style="margin-bottom: 1rem;">
+        <h1>Admin dashboard</h1>
+        <p>Manage products, orders and users through secure admin APIs.</p>
+        <p><a class="btn secondary" href="/frontend/pages/login.html">Admin login</a></p>
+      </div>
+      <section id="statsRoot"></section>
+      <h2>Recent orders</h2>
+      <section id="ordersRoot" class="grid"></section>
+    </main>
+    <div id="layout-footer"></div>
+
+    <script src="/frontend/components/layout.js"></script>
+    <script src="/frontend/js/config.js"></script>
+    <script src="/frontend/js/api.js"></script>
+    <script src="/frontend/js/app.js"></script>
+    <script src="/frontend/js/admin.js"></script>
+  </body>
+</html>

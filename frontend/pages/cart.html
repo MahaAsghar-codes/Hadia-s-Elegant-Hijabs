@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cart & Checkout | Hadia's Elegant Hijabs</title>
+    <link rel="stylesheet" href="/frontend/css/style.css" />
+  </head>
+  <body>
+    <div id="layout-header"></div>
+    <main class="container page-hero checkout-layout">
+      <section>
+        <h1>Your cart</h1>
+        <div id="cartItems"></div>
+      </section>
+      <aside class="card">
+        <h2>Checkout</h2>
+        <p>Subtotal: <strong id="subtotal">$0.00</strong></p>
+        <form id="checkoutForm" class="form-grid">
+          <input name="fullName" placeholder="Full name" required />
+          <input name="phone" placeholder="Phone number" required />
+          <input name="city" placeholder="City" required />
+          <textarea name="addressLine" placeholder="Address" required></textarea>
+          <select name="paymentMethod" required>
+            <option value="COD">Cash on delivery</option>
+            <option value="Card">Card</option>
+            <option value="Bank">Bank transfer</option>
+          </select>
+          <button class="btn">Place order</button>
+        </form>
+      </aside>
+    </main>
+    <div id="layout-footer"></div>
+
+    <script src="/frontend/components/layout.js"></script>
+    <script src="/frontend/js/config.js"></script>
+    <script src="/frontend/js/api.js"></script>
+    <script src="/frontend/js/app.js"></script>
+    <script src="/frontend/js/cart.js"></script>
+  </body>
+</html>
