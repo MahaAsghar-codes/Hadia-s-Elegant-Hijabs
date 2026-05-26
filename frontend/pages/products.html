@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shop | Hadia's Elegant Hijabs</title>
+    <link rel="stylesheet" href="/frontend/css/style.css" />
+  </head>
+  <body>
+    <div id="layout-header"></div>
+    <main class="container">
+      <section class="page-hero">
+        <h1>Shop collection</h1>
+        <form id="filterForm" class="form-grid" style="grid-template-columns: 2fr 1fr auto;">
+          <input id="searchInput" placeholder="Search products" />
+          <select id="categorySelect"></select>
+          <button class="btn">Apply</button>
+        </form>
+      </section>
+      <section id="productList" class="grid"></section>
+    </main>
+    <div id="layout-footer"></div>
+
+    <script src="/frontend/components/layout.js"></script>
+    <script src="/frontend/js/config.js"></script>
+    <script src="/frontend/js/api.js"></script>
+    <script src="/frontend/js/app.js"></script>
+    <script src="/frontend/js/products.js"></script>
+  </body>
+</html>
