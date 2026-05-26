@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const { isValidObjectId } = require('../utils/validators');
 
 const getWishlist = async (req, res, next) => {
   try {
@@ -12,6 +13,7 @@ const getWishlist = async (req, res, next) => {
 const toggleWishlist = async (req, res, next) => {
   try {
     const { productId } = req.body;
+    if (!isValidObjectId(productId)) return res.status(400).json({ message: 'Invalid product id' });
     const user = await User.findById(req.user._id);
 
     const index = user.wishlist.findIndex((id) => id.toString() === productId);

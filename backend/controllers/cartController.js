@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const Product = require('../models/Product');
+const { isValidObjectId } = require('../utils/validators');
 
 const getCart = async (req, res, next) => {
   try {
@@ -13,6 +14,7 @@ const getCart = async (req, res, next) => {
 const addToCart = async (req, res, next) => {
   try {
     const { productId, quantity = 1 } = req.body;
+    if (!isValidObjectId(productId)) return res.status(400).json({ message: 'Invalid product id' });
     const product = await Product.findById(productId);
     if (!product) return res.status(404).json({ message: 'Product not found' });
 
@@ -35,6 +37,7 @@ const addToCart = async (req, res, next) => {
 const updateCartItem = async (req, res, next) => {
   try {
     const { quantity } = req.body;
+    if (!isValidObjectId(req.params.productId)) return res.status(400).json({ message: 'Invalid product id' });
     const user = await User.findById(req.user._id);
     const item = user.cart.find((cartItem) => cartItem.product.toString() === req.params.productId);
 
@@ -51,6 +54,7 @@ const updateCartItem = async (req, res, next) => {
 
 const removeFromCart = async (req, res, next) => {
   try {
+    if (!isValidObjectId(req.params.productId)) return res.status(400).json({ message: 'Invalid product id' });
     const user = await User.findById(req.user._id);
     user.cart = user.cart.filter((item) => item.product.toString() !== req.params.productId);
     await user.save();

@@ -60,12 +60,14 @@ const seed = async () => {
     }
   ]);
 
-  const adminPassword = process.env.ADMIN_PASSWORD || 'ChangeMe123!';
+  if (!process.env.ADMIN_PASSWORD) {
+    throw new Error('ADMIN_PASSWORD must be set before running seed script');
+  }
 
   await User.create({
     name: 'Admin',
     email: process.env.ADMIN_EMAIL || 'admin@hadiaeleganthijabs.com',
-    password: await bcrypt.hash(adminPassword, 10),
+    password: await bcrypt.hash(process.env.ADMIN_PASSWORD, 10),
     role: 'admin'
   });
 

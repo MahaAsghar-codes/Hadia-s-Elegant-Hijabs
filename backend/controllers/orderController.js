@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const Order = require('../models/Order');
+const { isValidObjectId } = require('../utils/validators');
 
 const createOrder = async (req, res, next) => {
   try {
@@ -55,6 +56,10 @@ const getAllOrders = async (req, res, next) => {
 
 const updateOrderStatus = async (req, res, next) => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).json({ message: 'Invalid order id' });
+    }
+
     const order = await Order.findByIdAndUpdate(
       req.params.id,
       { status: req.body.status },

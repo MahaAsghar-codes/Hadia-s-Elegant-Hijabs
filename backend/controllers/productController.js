@@ -1,4 +1,5 @@
 const Product = require('../models/Product');
+const { isValidObjectId } = require('../utils/validators');
 
 const getProducts = async (req, res, next) => {
   try {
@@ -6,7 +7,12 @@ const getProducts = async (req, res, next) => {
 
     const filter = {};
     if (q) filter.name = { $regex: q, $options: 'i' };
-    if (category) filter.category = category;
+    if (category) {
+      if (!isValidObjectId(category)) {
+        return res.status(400).json({ message: 'Invalid category filter' });
+      }
+      filter.category = category;
+    }
     if (featured === 'true') filter.featured = true;
     if (minPrice || maxPrice) {
       filter.price = {};
@@ -23,6 +29,10 @@ const getProducts = async (req, res, next) => {
 
 const getProductById = async (req, res, next) => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).json({ message: 'Invalid product id' });
+    }
+
     const product = await Product.findById(req.params.id).populate('category', 'name description');
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
@@ -44,6 +54,10 @@ const createProduct = async (req, res, next) => {
 
 const updateProduct = async (req, res, next) => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).json({ message: 'Invalid product id' });
+    }
+
     const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true
@@ -59,6 +73,10 @@ const updateProduct = async (req, res, next) => {
 
 const deleteProduct = async (req, res, next) => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).json({ message: 'Invalid product id' });
+    }
+
     const product = await Product.findById(req.params.id);
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
